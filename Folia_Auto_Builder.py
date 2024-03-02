@@ -12,7 +12,7 @@ MoveBuildToMainDir=True
 # This moves build
 DeletetempFolderTree=True
 # Removes folder, uses shutil.
-Build=False
+Build=True
 # Skips build, just collects files.
 
 import os, sys, time, shutil # Needed to access terminal
