@@ -13,7 +13,7 @@ MoveBuildToMainDir=True
 DeletetempFolderTree=True
 # Removes folder, uses shutil.
 Build=True
-# Skips build, just collects files.
+# Skips build, just collects files. MoveBuildToMainDir Does nothing if Build=False.
 
 import os, sys, time, shutil # Needed to access terminal
 os.system('clear') # Clears terminal
@@ -30,9 +30,9 @@ if confirm == 'y': # Continue
     print('-- Action Confirmed! --',
           '\nImporting Folia into folder:', tempFolder)
     if os.path.exists(tempFolder): # Check to see if folder exists.
-        print('System: Folder Exists, Skipping creation.')
-    else:
-        os.system("mkdir '"+ str(tempFolder)+ "'")
+        print('System: Folder Exists, Removing Tree')
+        shutil.rmtree(tempFolder)
+    os.system("mkdir '"+ str(tempFolder)+ "'")
     time.sleep(1) # Give time for user to read then clear.
     #commands=[[tempFolder, 1],['clear', 0], ['pwd', 0], ['Folia',1]] #Testing Commands
     commands=[[tempFolder, 1],['clear', 0], ['pwd', 0], ['git clone https://github.com/PaperMC/Folia', 0], ['Folia',1], ['./gradlew applyPatches', 0, Build], ['./gradlew createReobfBundlerJar', 0, Build]]
@@ -43,33 +43,34 @@ if confirm == 'y': # Continue
             allowRun=(commands[i])[2]
             if allowRun == False:
                 print('Skipping command:',i)
-        except: allowRun=False
+        except: allowRun=True
         if (commands[i])[1] == 0:
             if allowRun==True:
                 os.system((commands[i])[0])
         else:
             os.chdir(str((commands[i])[0]))
     if MoveBuildToMainDir:
-        os.chdir(str(os.getcwd()+'/build/libs'))
-        files=(os.listdir())
-        os.rename(files[0], 'Folia_Server.jar')
-        buildNum=1
-        checkedCurrentBuilds=False
-        while checkedCurrentBuilds==False:
-            file = str(current_directory+'/Folia_Server_#'+str(buildNum)+'.jar')
-            if os.path.exists(file):
-                buildNum+=1
+        if Build==True:
+            os.chdir(str(os.getcwd()+'/build/libs'))
+            files=(os.listdir())
+            os.rename(files[0], 'Folia_Server.jar')
+            buildNum=1
+            checkedCurrentBuilds=False
+            while checkedCurrentBuilds==False:
+                file = str(current_directory+'/Folia_Server_#'+str(buildNum)+'.jar')
+                if os.path.exists(file):
+                    buildNum+=1
+                else:
+                    checkedCurrentBuilds=True
+            os.replace(str(os.getcwd()+'/Folia_Server.jar'),current_directory+'/Folia_Server_#'+str(buildNum)+'.jar') 
+            print('System: File has been placed at root directory from startup:', current_directory)
+            os.chdir(current_directory)
+            time.sleep(2)
+            if DeletetempFolderTree==True:
+                shutil.rmtree(tempFolder) # Clears all of tempFolder
+                print('System: Build and Rm of temp folder has been completed. Closing Script.')
             else:
-                checkedCurrentBuilds=True
-        os.replace(str(os.getcwd()+'/Folia_Server.jar'),current_directory+'/Folia_Server_#'+str(buildNum)+'.jar') 
-        print('System: File has been placed at root directory from startup:', current_directory)
-        os.chdir(current_directory)
-        time.sleep(2)
-        if DeletetempFolderTree==True:
-            shutil.rmtree(tempFolder) # Clears all of tempFolder
-            print('System: Build and Rm of temp folder has been completed. Closing Script.')
-        else:
-            print('System: Build has been completed. Closing Script.')
+                print('System: Build has been completed. Closing Script.')
     else:
         build_Dir= str(os.getcwd()+'/build/libs')
         print('System: If build completed, it will be placed in: ',
