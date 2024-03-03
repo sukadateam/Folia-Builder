@@ -1,4 +1,4 @@
-# Folia-Builder
+# Folia/Paper-Builder
 Automated Project Folia Builder. Easy to run and only 4 settings.
 
 #Settings are as followed:
