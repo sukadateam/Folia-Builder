@@ -68,7 +68,6 @@ while True:
                     else:
                         b+=1
                 xlist[0]='\n'+xlist[0] # Fixes the first entry not being a valid file/folder
-                print(xlist)
                 for i in range(len(xlist)):
                     print(('('+str(i)+') - '+str((xlist[i])[1:len(xlist[i])])))
                 totalEntryC=len(xlist) # Total amount of files/folders
