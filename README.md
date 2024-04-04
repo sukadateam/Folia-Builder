@@ -15,3 +15,7 @@ Arguments will be as followed:
 -     -f , --Folia (Folia) - Following -b
 -     -p , --Paper (Paper) - Following -b
 -     -r , --Remove (Clean up after build)
+
+
+Updates To script last commit:
+  - 1) Added last commit date for each repo. Seen on startup.
