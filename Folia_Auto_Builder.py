@@ -17,6 +17,39 @@ DeletetempFolderTree=True
 Build=True
 # Skips build, just collects files. MoveBuildToMainDir Does nothing if Build=False.
 
+import requests
+import json
+from datetime import datetime, timezone
+
+# Gathers commit date from github
+def get_last_commit_date(repo_url):
+    # Get the API url from the repository url
+    api_url = repo_url.replace('github.com', 'api.github.com/repos') + '/commits/master'
+    # Send a GET request to the API url
+    response = requests.get(api_url)
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the response as JSON
+        data = json.loads(response.text)
+        # Check if the 'commit' key exists in the data
+        if 'commit' in data and 'committer' in data['commit'] and 'date' in data['commit']['committer']:
+            # Get the date of the last commit
+            commit_date = data['commit']['committer']['date']
+            # Parse the commit date as a datetime object
+            commit_date = datetime.strptime(commit_date, '%Y-%m-%dT%H:%M:%SZ')
+            # Replace the timezone information with UTC
+            commit_date = commit_date.replace(tzinfo=timezone.utc)
+            # Get the current date
+            current_date = datetime.now(timezone.utc)
+            # Calculate the difference between the current date and the commit date
+            diff = current_date - commit_date
+            # Return the difference in days and hours
+            return f'{diff.days} days and {diff.seconds // 3600} hours ago'
+        else:
+            return 'No commit data found'
+    else:
+        return 'Failed to fetch commit data'
+
 import os, sys, time, shutil, subprocess # Needed to access terminal
 os.system('clear') # Clears terminal
 os.chdir(str(os.getcwd()+'/Desktop'))
@@ -24,7 +57,9 @@ current_directory = os.getcwd() #Does not get modified after intial value is set
 '''Directory At startup'''
 while True:
     os.system('clear')
-    print('Build Will Occur In:',current_directory)
+    print('Folia last commit date:\033[1;31;40m', get_last_commit_date('https://github.com/PaperMC/Folia'))
+    print('\033[0;37;40mPaperMC last commit date:\033[1;31;40m', get_last_commit_date('https://github.com/PaperMC/Paper'))
+    print('\033[0;37;40mBuild Will Occur In:',current_directory)
     buildType=input('What are we building?\n1 - (Folia)\n2 - (PaperMC)\n3 - (Change Directory)\nYour choice: ')
     '''1 - Folia, 2 - PaperMC'''
     if buildType in ['1', '2']:
